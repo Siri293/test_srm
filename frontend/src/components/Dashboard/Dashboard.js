@@ -32,22 +32,30 @@ const Dashboard = () => {
     try {
       setLoading(true);
       
-      // Fetch multiple endpoints
-      const [subjectsRes, sessionsRes, analyticsRes, streakRes] = await Promise.all([
-        axios.get('/api/subjects/'),
-        axios.get('/api/sessions/?limit=10'),
-        axios.get('/api/sessions/analytics?days=7'),
-        axios.get('/api/sessions/streak')
-      ]);
+      // Mock data for demo
+      const mockSubjects = [
+        { id: 1, name: 'Mathematics', color: '#3B82F6' },
+        { id: 2, name: 'Computer Science', color: '#10B981' },
+        { id: 3, name: 'Physics', color: '#F59E0B' }
+      ];
+      
+      const mockAnalytics = {
+        summary: {
+          total_time: 15.5,
+          average_focus_level: 7.8
+        }
+      };
+      
+      const mockStreak = { current_streak: 5 };
 
       setStats({
-        totalSubjects: subjectsRes.data.length,
-        totalSessions: sessionsRes.data.length,
-        totalStudyTime: analyticsRes.data.summary.total_time,
-        currentStreak: streakRes.data.current_streak
+        totalSubjects: mockSubjects.length,
+        totalSessions: 12,
+        totalStudyTime: mockAnalytics.summary.total_time,
+        currentStreak: mockStreak.current_streak
       });
 
-      setAnalytics(analyticsRes.data);
+      setAnalytics(mockAnalytics);
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
     } finally {

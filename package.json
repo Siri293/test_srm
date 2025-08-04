@@ -1,0 +1,12 @@
+{
+  "name": "studysphere-fullstack",
+  "version": "1.0.0",
+  "description": "StudySphere - AI-Powered Learning Progress Tracker",
+  "scripts": {
+    "install-frontend": "cd frontend && npm install",
+    "start-frontend": "cd frontend && npm start",
+    "start": "npm run install-frontend && npm run start-frontend"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

@@ -21,8 +21,15 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem('token');
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      // Verify token and get user profile
-      fetchProfile();
+      // For demo mode, set a mock user
+      setUser({
+        id: 1,
+        email: 'demo@studysphere.com',
+        role: 'student',
+        academic_goal: 'Complete my studies with excellence',
+        focus_areas: 'Mathematics, Computer Science'
+      });
+      setLoading(false);
     } else {
       setLoading(false);
     }
@@ -42,12 +49,15 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post('/api/auth/login', {
-        email,
-        password
-      });
-
-      const { token, user } = response.data;
+      // Mock login for demo
+      const token = 'demo-token-' + Date.now();
+      const user = {
+        id: 1,
+        email: email,
+        role: 'student',
+        academic_goal: 'Complete my studies with excellence',
+        focus_areas: 'Mathematics, Computer Science'
+      };
       
       localStorage.setItem('token', token);
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -64,9 +74,15 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      const response = await axios.post('/api/auth/signup', userData);
-      
-      const { token, user } = response.data;
+      // Mock registration for demo
+      const token = 'demo-token-' + Date.now();
+      const user = {
+        id: 1,
+        email: userData.email,
+        role: 'student',
+        academic_goal: userData.academic_goal || 'Complete my studies with excellence',
+        focus_areas: userData.focus_areas || 'Mathematics, Computer Science'
+      };
       
       localStorage.setItem('token', token);
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;

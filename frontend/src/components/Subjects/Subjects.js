@@ -16,8 +16,31 @@ const Subjects = () => {
 
   const fetchSubjects = async () => {
     try {
-      const response = await axios.get('/api/subjects/');
-      setSubjects(response.data);
+      // Mock subjects data for demo
+      const mockSubjects = [
+        {
+          id: 1,
+          name: 'Mathematics',
+          color: '#3B82F6',
+          total_study_time: 8.5,
+          created_at: new Date().toISOString()
+        },
+        {
+          id: 2,
+          name: 'Computer Science',
+          color: '#10B981',
+          total_study_time: 12.3,
+          created_at: new Date().toISOString()
+        },
+        {
+          id: 3,
+          name: 'Physics',
+          color: '#F59E0B',
+          total_study_time: 6.7,
+          created_at: new Date().toISOString()
+        }
+      ];
+      setSubjects(mockSubjects);
     } catch (error) {
       console.error('Failed to fetch subjects:', error);
       toast.error('Failed to load subjects');
