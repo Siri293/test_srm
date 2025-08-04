@@ -8,10 +8,20 @@ import openai
 ai_bp = Blueprint('ai', __name__)
 
 # Configure Azure OpenAI
-openai.api_type = "azure"
-openai.api_key = os.getenv('AZURE_OPENAI_KEY')
-openai.api_base = os.getenv('AZURE_OPENAI_ENDPOINT')
-openai.api_version = "2023-05-15"
+# Check if Azure OpenAI is configured
+AZURE_OPENAI_KEY = os.getenv('AZURE_OPENAI_KEY')
+AZURE_OPENAI_ENDPOINT = os.getenv('AZURE_OPENAI_ENDPOINT')
+AZURE_OPENAI_DEPLOYMENT = os.getenv('AZURE_OPENAI_DEPLOYMENT_NAME', 'gpt-35-turbo')
+
+# Only configure OpenAI if credentials are available
+if AZURE_OPENAI_KEY and AZURE_OPENAI_ENDPOINT:
+    openai.api_type = "azure"
+    openai.api_key = AZURE_OPENAI_KEY
+    openai.api_base = AZURE_OPENAI_ENDPOINT
+    openai.api_version = "2023-05-15"
+    AI_ENABLED = True
+else:
+    AI_ENABLED = False
 
 def get_study_data_for_ai(user_id, days=7):
     """Get study data formatted for AI analysis"""
@@ -77,6 +87,19 @@ def get_study_data_for_ai(user_id, days=7):
 
 def generate_ai_suggestions(study_data):
     """Generate AI suggestions using Azure OpenAI"""
+    # Check if AI is enabled
+    if not AI_ENABLED:
+        return {
+            'suggestions': [
+                "Configure Azure OpenAI to get personalized AI suggestions",
+                "Focus on maintaining consistent study sessions",
+                "Try to improve your focus levels gradually"
+            ],
+            'attention_areas': ["AI suggestions unavailable - check configuration"],
+            'motivation': "Keep up the great work with your studies!",
+            'pattern_analysis': "AI analysis unavailable. Configure Azure OpenAI for detailed insights."
+        }
+    
     try:
         # Prepare the prompt
         prompt = f"""
@@ -118,7 +141,7 @@ def generate_ai_suggestions(study_data):
         
         # Call Azure OpenAI
         response = openai.ChatCompletion.create(
-            engine="gpt-35-turbo",  # Replace with your deployment name
+            engine=AZURE_OPENAI_DEPLOYMENT,
             messages=[
                 {"role": "system", "content": "You are a supportive and knowledgeable study coach. Provide practical, encouraging advice based on student data."},
                 {"role": "user", "content": prompt}
@@ -127,10 +150,23 @@ def generate_ai_suggestions(study_data):
             temperature=0.7
         )
         
-        return response.choices[0].message.content
+        # Try to parse JSON response, fallback to structured response
+        try:
+            import json
+            return json.loads(response.choices[0].message.content)
+        except:
+            # If AI didn't return valid JSON, create a structured response
+            return {
+                'suggestions': [
+                    "Focus on maintaining consistent study sessions",
+                    "Try to improve your focus levels gradually"
+                ],
+                'attention_areas': ["Study consistency"],
+                'motivation': "Keep up the great work!",
+                'pattern_analysis': response.choices[0].message.content
+            }
         
     except Exception as e:
-        return f"Error generating suggestions: {str(e)}"
 
 @ai_bp.route('/suggestions', methods=['GET'])
 @jwt_required()
