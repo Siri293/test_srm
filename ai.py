@@ -319,8 +319,11 @@ def get_subject_feedback(subject_id):
         """
         
         try:
+            if not AI_ENABLED:
+                feedback = f"Great work studying {subject.name}! Keep up the consistent effort."
+            else:
             response = openai.ChatCompletion.create(
-                engine="gpt-35-turbo",
+                engine=AZURE_OPENAI_DEPLOYMENT,
                 messages=[
                     {"role": "system", "content": "You are a supportive subject-specific tutor."},
                     {"role": "user", "content": prompt}
